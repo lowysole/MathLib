@@ -1,10 +1,14 @@
 #include "Application.h"
 
 #include "Globals.h"
+#include "Utils/Logging.h"
+
+#include "Utils/Leaks.h"
 
 enum class MainState {
 	CREATION,
 	INIT,
+	START,
 	UPDATE,
 	FINISH,
 	EXIT
@@ -13,6 +17,10 @@ enum class MainState {
 Application* App = nullptr;
 
 int main() {
+	// Logging
+	logger = new Logger();
+
+	// App Loop
 	int mainReturn = EXIT_FAILURE;
 	MainState state = MainState::CREATION;
 	while (state != MainState::EXIT) {
@@ -24,6 +32,14 @@ int main() {
 
 		case MainState::INIT:
 			if (App->Init() == false) {
+				state = MainState::EXIT;
+			} else {
+				state = MainState::START;
+			}
+			break;
+
+		case MainState::START:
+			if (App->Start() == false) {
 				state = MainState::EXIT;
 			} else {
 				state = MainState::UPDATE;
@@ -52,7 +68,8 @@ int main() {
 		}
 	}
 
-	delete App;
+	RELEASE(App);
+	RELEASE(logger);
 
 	return mainReturn;
 }

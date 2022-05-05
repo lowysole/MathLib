@@ -5,8 +5,9 @@
 enum class UpdateStatus;
 
 class Module;
+class ModuleWindow;
+class ModuleInput;
 class ModuleEditor;
-class ModuleWindows;
 class ModuleRender;
 
 class Application {
@@ -15,13 +16,17 @@ public:
 	~Application();
 
 	bool Init();
+	bool Start();
 	UpdateStatus Update();
 	bool CleanUp();
 
 public:
-	ModuleWindows* windows = nullptr;
+	ModuleWindow* window = nullptr;
+	ModuleInput* input = nullptr;
 	ModuleEditor* editor = nullptr;
 	ModuleRender* render = nullptr;
+
+	char appName[20] = "MathLib";
 
 private:
 	std::vector<Module*> modules;

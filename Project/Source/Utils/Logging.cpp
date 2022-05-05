@@ -6,6 +6,7 @@
 
 void Logger::Log(const char file[], int line, const char* format, ...) {
 	// Construct the string from variable arguments
+
 	logMessageQueueMutex.lock();
 	va_list ap;
 	va_start(ap, format);

@@ -1,13 +1,15 @@
 #include "Application.h"
 
 #include "Globals.h"
-#include "Modules/ModuleWindows.h"
+#include "Modules/ModuleWindow.h"
+#include "Modules/ModuleInput.h"
 #include "Modules/ModuleEditor.h"
 #include "Modules/ModuleRender.h"
 
 Application::Application() {
 	// NOTE: Add all modules from App here. Important Order of creation.
-	modules.push_back(windows = new ModuleWindows());
+	modules.push_back(window = new ModuleWindow());
+	modules.push_back(input = new ModuleInput());
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(render = new ModuleRender());
 }
@@ -20,8 +22,16 @@ Application::~Application() {
 
 bool Application::Init() {
 	bool status = true;
-	for (std::vector<Module*>::iterator it = modules.begin(); it != modules.end(); ++it) {
+	for (std::vector<Module*>::iterator it = modules.begin(); it != modules.end() && status; ++it) {
 		status = (*it)->Init();
+	}
+	return status;
+}
+
+bool Application::Start() {
+	bool status = true;
+	for (std::vector<Module*>::iterator it = modules.begin(); it != modules.end() && status; ++it) {
+		status = (*it)->Start();
 	}
 	return status;
 }
@@ -29,8 +39,16 @@ bool Application::Init() {
 UpdateStatus Application::Update() {
 	UpdateStatus status = UpdateStatus::CONTINUE;
 
-	for (std::vector<Module*>::iterator it = modules.begin(); it != modules.end(); ++it) {
+	for (std::vector<Module*>::iterator it = modules.begin(); it != modules.end() && status == UpdateStatus::CONTINUE; ++it) {
+		status = (*it)->PreUpdate();
+	}
+
+	for (std::vector<Module*>::iterator it = modules.begin(); it != modules.end() && status == UpdateStatus::CONTINUE; ++it) {
 		status = (*it)->Update();
+	}
+
+	for (std::vector<Module*>::iterator it = modules.begin(); it != modules.end() && status == UpdateStatus::CONTINUE; ++it) {
+		status = (*it)->PostUpdate();
 	}
 
 	return status;
@@ -38,7 +56,7 @@ UpdateStatus Application::Update() {
 
 bool Application::CleanUp() {
 	bool status = true;
-	for (std::vector<Module*>::reverse_iterator it = modules.rbegin(); it != modules.rend(); ++it) {
+	for (std::vector<Module*>::reverse_iterator it = modules.rbegin(); it != modules.rend() && status; ++it) {
 		status = (*it)->CleanUp();
 	}
 	return status;

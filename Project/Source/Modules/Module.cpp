@@ -2,21 +2,29 @@
 
 #include "../Globals.h"
 
-Module::~Module()
-{
+Module::~Module() {
 }
 
-bool Module::Init()
-{
+bool Module::Init() {
 	return true;
 }
 
-UpdateStatus Module::Update()
-{
+bool Module::Start() {
+	return true;
+}
+
+UpdateStatus Module::PreUpdate() {
 	return UpdateStatus::CONTINUE;
 }
 
-bool Module::CleanUp()
-{
+UpdateStatus Module::Update() {
+	return UpdateStatus::CONTINUE;
+}
+
+UpdateStatus Module::PostUpdate() {
+	return UpdateStatus::CONTINUE;
+}
+
+bool Module::CleanUp() {
 	return true;
 }

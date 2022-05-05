@@ -1,8 +1,11 @@
 # Visual Studio 2015/2017 cache/options directory
-/.vs/
+Project/.vs/
 
 # User files
 *.user
 
 # Build results
-/Build/
+Project/Build/
+
+# Imgui init
+Project/imgui.ini

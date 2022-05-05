@@ -3,7 +3,7 @@
 #include <iostream>
 class float2
 {
-private:
+public:
 	float x;
 	float y;
 

@@ -51,7 +51,7 @@ float3& float3::operator*=(const float scalar) {
 }
 
 float3& float3::operator/=(const float scalar) {
-	int invScalar = 1.0f / scalar;
+	float invScalar = 1.0f / scalar;
 	x = x * invScalar;
 	y = y * invScalar;
 	z = z * invScalar;
