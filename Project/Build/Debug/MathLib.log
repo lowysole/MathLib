@@ -1,0 +1,12 @@
+﻿  ModuleRender.cpp
+  ModuleWindows.cpp
+  float3.cpp
+C:\Users\lowys\source\repos\MathLib\Project\Source\Resources\Math\float3.cpp(54,16): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  float2.cpp
+  Module.cpp
+  Application.cpp
+  main.cpp
+  ModuleEditor.cpp
+  Logging.cpp
+  Generating Code...
+  MathLib.vcxproj -> C:\Users\lowys\source\repos\MathLib\Project\Build\Debug\MathLib.exe
