@@ -18,17 +18,167 @@
 static const ImWchar iconsRangesFa[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
 static const ImWchar iconsRangesFk[] = {ICON_MIN_FK, ICON_MAX_FK, 0};
 
+bool ModuleEditor::Init() {
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+		io.ConfigViewportsNoAutoMerge = false;
+		io.ConfigViewportsNoTaskBarIcon = true;
+	}
+
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+		io.ConfigDockingTransparentPayload = true;
+	}
+
+	SetImGuiTheme();
+
+	// Set Panels
+	panels.push_back(&panelAbout);
+	panels.push_back(&panelOperations);
+	panels.push_back(&panelResource);
+	panels.push_back(&panelResult);
+	panels.push_back(&panelConsole);
+
+	return true;
+}
+
+bool ModuleEditor::Start() {
+	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->render->context);
+	ImGui_ImplOpenGL3_Init(GLSL_VERSION);
+
+	ImGui::StyleColorsDark();
+
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	workPos = viewport->WorkPos;
+	workSize = viewport->WorkSize;
+
+	return true;
+}
+
+UpdateStatus ModuleEditor::PreUpdate() {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+
+	//ImGuiViewport* viewport = ImGui::GetMainViewport();
+	//if (viewport->WorkSize.x != workSize.x || viewport->WorkSize.y != workSize.y) {
+	//	isResized = true;
+	//}
+
+	return UpdateStatus::CONTINUE;
+}
+
+UpdateStatus ModuleEditor::Update() {
+	ImGui::ShowDemoWindow();
+
+	// Main Menu bar
+	ImGui::BeginMainMenuBar();
+	if (ImGui::BeginMenu("File")) {
+		if (ImGui::MenuItem("Quit")) {
+			modalToOpen = Modal::QUIT;
+		}
+		ImGui::EndMenu();
+	}
+
+	if (ImGui::BeginMenu("Windows")) {
+		ImGui::MenuItem(panelOperations.GetName(), "", &panelOperations.UpdateEnabled());
+		ImGui::MenuItem(panelResult.GetName(), "", &panelResult.UpdateEnabled());
+		ImGui::MenuItem(panelConsole.GetName(), "", &panelConsole.UpdateEnabled());
+		ImGui::EndMenu();
+	}
+
+	if (ImGui::BeginMenu("Help")) {
+		ImGui::MenuItem(panelAbout.GetName(), "", &panelAbout.UpdateEnabled());
+		ImGui::EndMenu();
+	}
+
+	ImGui::EndMainMenuBar();
+
+	// Modals
+	switch (modalToOpen) {
+	case Modal::QUIT:
+		ImGui::OpenPopup("Quit");
+		break;
+	}
+	modalToOpen = Modal::NONE;
+
+	// Quit Modal
+	ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
+	if (ImGui::BeginPopupModal("Quit", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar)) {
+		ImGui::Text("Do you really want to quit?");
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::SameLine(ImGui::GetWindowWidth() - 140);
+		if (ImGui::Button("Quit", ImVec2(60, 20))) {
+			return UpdateStatus::STOP;
+		}
+		ImGui::SameLine(ImGui::GetWindowWidth() - 70);
+		if (ImGui::Button("Cancel", ImVec2(60, 20))) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+	for (Panel* panel : panels) {
+		if (panel->GetEnabled()) panel->Update();
+	}
+
+	return UpdateStatus::CONTINUE;
+}
+
+UpdateStatus ModuleEditor::PostUpdate() {
+	// Render main window
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	// Handle and render other windows
+	ImGui::UpdatePlatformWindows();
+	ImGui::RenderPlatformWindowsDefault();
+	SDL_GL_MakeCurrent(App->window->window, App->render->context);
+
+	//if (isResized) {
+	//	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	//	isResized = false;
+	//	workSize.x = viewport->WorkSize.x;
+	//	workSize.y = viewport->WorkSize.y;
+	//}
+
+	return UpdateStatus::CONTINUE;
+}
+
+bool ModuleEditor::CleanUp() {
+	panels.clear();
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
+	return true;
+}
+
+bool ModuleEditor::GetIsResized() const {
+	return isResized;
+}
+
+ImVec2 ModuleEditor::GetWorkSize() const {
+	return workSize;
+}
+
 void ModuleEditor::SetImGuiTheme() {
 	//Font
-	ImGui::GetIO().Fonts->AddFontDefault();
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("Resources/Fonts/Gravity_Book.otf", 18.0f);
 	ImFontConfig iconsConfig;
 	iconsConfig.MergeMode = true;
 	iconsConfig.PixelSnapH = true;
-	ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/" FONT_ICON_FILE_NAME_FAS, 12.0f, &iconsConfig, iconsRangesFa);
-	ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/" FONT_ICON_FILE_NAME_FK, 12.0f, &iconsConfig, iconsRangesFk);
+	io.Fonts->AddFontFromFileTTF("Resources/Fonts/" FONT_ICON_FILE_NAME_FAS, 12.0f, &iconsConfig, iconsRangesFa);
+	io.Fonts->AddFontFromFileTTF("Resources/Fonts/" FONT_ICON_FILE_NAME_FK, 12.0f, &iconsConfig, iconsRangesFk);
 
-	ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF("Resources/Fonts/Gravity_Book.otf", 18);
 
 	// Colors
 	ImVec4* colors = ImGui::GetStyle().Colors;
@@ -105,120 +255,4 @@ void ModuleEditor::SetImGuiTheme() {
 	style.GrabRounding = 3;
 	style.LogSliderDeadzone = 4;
 	style.TabRounding = 4;
-
-
-}
-
-bool ModuleEditor::Init() {
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-	io.ConfigWindowsMoveFromTitleBarOnly = true;
-
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-		io.ConfigViewportsNoAutoMerge = false;
-		io.ConfigViewportsNoTaskBarIcon = true;
-	}
-
-	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-		io.ConfigDockingTransparentPayload = true;
-	}
-
-	SetImGuiTheme();
-
-	panels.push_back(&panelAbout);
-
-	return true;
-}
-
-bool ModuleEditor::Start() {
-	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->render->context);
-	ImGui_ImplOpenGL3_Init(GLSL_VERSION);
-
-	ImGui::StyleColorsDark();
-
-	return true;
-}
-
-UpdateStatus ModuleEditor::PreUpdate() {
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-	ImGui::NewFrame();
-
-	return UpdateStatus::CONTINUE;
-}
-
-UpdateStatus ModuleEditor::Update() {
-	ImGui::ShowDemoWindow();
-
-	// Main Menu bar
-	ImGui::BeginMainMenuBar();
-	if (ImGui::BeginMenu("File")) {
-		if (ImGui::MenuItem("Quit")) {
-			modalToOpen = Modal::QUIT;
-		}
-		ImGui::EndMenu();
-	}
-	if (ImGui::BeginMenu("Help")) {
-		ImGui::MenuItem(panelAbout.GetName(), "", &panelAbout.UpdateEnabled());
-		ImGui::EndMenu();
-	}
-
-	ImGui::EndMainMenuBar();
-
-	// Modals
-	switch (modalToOpen) {
-	case Modal::QUIT:
-		ImGui::OpenPopup("Quit");
-		break;
-	}
-	modalToOpen = Modal::NONE;
-
-	// Quit Modal
-	ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
-	if (ImGui::BeginPopupModal("Quit", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar)) {
-		ImGui::Text("Do you really want to quit?");
-		ImGui::NewLine();
-		ImGui::NewLine();
-		ImGui::SameLine(ImGui::GetWindowWidth() - 140);
-		if (ImGui::Button("Quit", ImVec2(60, 20))) {
-			return UpdateStatus::STOP;
-		}
-		ImGui::SameLine(ImGui::GetWindowWidth() - 70);
-		if (ImGui::Button("Cancel", ImVec2(60, 20))) {
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::EndPopup();
-	}
-
-	for (Panel* panel : panels) {
-		if (panel->GetEnabled()) panel->Update();
-	}
-
-	return UpdateStatus::CONTINUE;
-}
-
-UpdateStatus ModuleEditor::PostUpdate() {
-	// Render main window
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	// Handle and render other windows
-	ImGui::UpdatePlatformWindows();
-	ImGui::RenderPlatformWindowsDefault();
-	SDL_GL_MakeCurrent(App->window->window, App->render->context);
-
-	return UpdateStatus::CONTINUE;
-}
-
-bool ModuleEditor::CleanUp() {
-	panels.clear();
-
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
-
-	return true;
 }

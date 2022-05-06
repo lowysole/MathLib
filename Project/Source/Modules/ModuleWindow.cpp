@@ -50,3 +50,11 @@ bool ModuleWindow::CleanUp() {
 	SDL_Quit();
 	return true;
 }
+
+float2 ModuleWindow::GetWindowsSize() {
+	int w;
+	int h;
+	SDL_GetWindowSize(window, &w, &h);
+
+	return float2(w, h);
+}

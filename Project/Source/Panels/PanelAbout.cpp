@@ -16,9 +16,8 @@ PanelAbout::PanelAbout()
 }
 
 void PanelAbout::Update() {
-	ImGui::SetNextWindowSize(ImVec2(400.0f, 200.0f), ImGuiCond_FirstUseEver);
-	std::string windowName = std::string(ICON_FK_INFO_CIRCLE " ") + GetName();
-	if (ImGui::Begin(windowName.c_str(), &UpdateEnabled(), ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse)) {
+	std::string windowName = std::string(ICON_FK_INFO_CIRCLE "  ") + GetName();
+	if (ImGui::Begin(windowName.c_str(), &UpdateEnabled(), ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize)) {
 		ImGui::TextColored(App->editor->titleColor, "Math Lib");
 		ImGui::Separator();
 		ImGui::TextColored(App->editor->titleColor, u8"Lowy Solé");

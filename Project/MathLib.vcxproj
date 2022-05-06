@@ -27,6 +27,12 @@
     <ClCompile Include="Libs\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="Libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="Libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Source\ResourceClass\Math\ResourceClassFloat2.cpp" />
+    <ClCompile Include="Source\ResourceClass\ResourceClass.cpp" />
+    <ClCompile Include="Source\Panels\PanelResource.cpp" />
+    <ClCompile Include="Source\Panels\PanelOperations.cpp" />
+    <ClCompile Include="Source\Panels\PanelResult.cpp" />
+    <ClCompile Include="Source\Panels\PanelConsole.cpp" />
     <ClCompile Include="Source\Panels\PanelAbout.cpp" />
     <ClCompile Include="Source\Panels\Panel.cpp" />
     <ClCompile Include="Source\Modules\ModuleInput.cpp" />
@@ -142,6 +148,12 @@
     <ClInclude Include="Libs\SDL\include\SDL_version.h" />
     <ClInclude Include="Libs\SDL\include\SDL_video.h" />
     <ClInclude Include="Libs\SDL\include\SDL_vulkan.h" />
+    <ClInclude Include="Source\ResourceClass\Math\ResourceClassFloat2.h" />
+    <ClInclude Include="Source\ResourceClass\ResourceClass.h" />
+    <ClInclude Include="Source\Panels\PanelResource.h" />
+    <ClInclude Include="Source\Panels\PanelOperations.h" />
+    <ClInclude Include="Source\Panels\PanelResult.h" />
+    <ClInclude Include="Source\Panels\PanelConsole.h" />
     <ClInclude Include="Source\Panels\PanelAbout.h" />
     <ClInclude Include="Source\Panels\Panel.h" />
     <ClInclude Include="Source\Modules\ModuleInput.h" />

@@ -22,11 +22,18 @@ bool ModuleRender::Init() {
 	glEnable(GL_MULTISAMPLE);
 	glFrontFace(GL_CCW);
 
+	viewportSize = App->window->GetWindowsSize();
+	glViewport(0, 0, static_cast<int>(viewportSize.x), static_cast<int>(viewportSize.y));
+
 	return true;
 }
 
 UpdateStatus ModuleRender::Update() {
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	if (IsResized()) {
+		glViewport(0, 0, static_cast<int>(viewportSize.x), static_cast<int>(viewportSize.y));
+	}
+
+	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_ALWAYS);
@@ -44,4 +51,27 @@ UpdateStatus ModuleRender::PostUpdate() {
 
 bool ModuleRender::CleanUp() {
 	return true;
+}
+
+bool ModuleRender::IsResized() {
+
+	float2 size = App->window->GetWindowsSize();
+	if (size.x != viewportSize.x && size.y != viewportSize.y) {
+		viewportUpdated = true;
+		viewportSize.x = size.x;
+		viewportSize.y = size.y;
+
+	} else {
+		viewportUpdated = false;
+	}
+
+	return viewportUpdated;
+}
+
+bool ModuleRender::GetIsResized() const {
+	return viewportUpdated;
+}
+
+float2 ModuleRender::GetViewportSize() const {
+	return viewportSize;
 }

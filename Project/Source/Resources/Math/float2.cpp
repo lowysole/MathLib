@@ -130,3 +130,8 @@ std::ostream& operator<<(std::ostream& out, const float2& f) {
     out << "x: " << f.x << ", y: " << f.y;
     return out;
 }
+
+const float2 float2::zero = float2(0, 0);
+const float2 float2::one = float2(1, 1);
+const float2 float2::unitX = float2(1, 0);
+const float2 float2::unitY = float2(0, 1);

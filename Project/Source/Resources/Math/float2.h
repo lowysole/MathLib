@@ -55,5 +55,11 @@ public:
 	float2 yx() const;
 	float2 yy() const;
 
+	/// Specifies a compile-time constant float2
+	static const float2 zero;
+	static const float2 one;
+	static const float2 unitX;
+	static const float2 unitY;
+
 	friend std::ostream& operator<<(std::ostream& out, const float2& f);
 };
